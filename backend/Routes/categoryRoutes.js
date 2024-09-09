@@ -6,7 +6,7 @@ import {
   removeCategory,
   listCategory,
   readCategory,
-} from "../controllers/categoryController.js";
+} from "../Controllers/categoryController.js";
 
 import { authenticate, authorizeAdmin } from "../Middlewares/authMiddleware.js";
 
