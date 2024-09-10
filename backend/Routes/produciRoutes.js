@@ -14,7 +14,7 @@ import {
   fetchTopProducts,
   fetchNewProducts,
   filterProducts,
-} from "../controllers/productController.js";
+} from "../Controllers/productController.js";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 import checkId from "../middlewares/checkId.js";
 
