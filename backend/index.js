@@ -5,6 +5,7 @@ import connectDB from "./Config/db.js";
 import userRoutes from "./Routes/userRoutes.js";
 import categoryRoutes from "./Routes/categoryRoutes.js";
 import productRoutes from "./Routes/productsRoutes.js";
+import uploadRoute from "./Routes/uploadRoute.js";
 
 dotenv.config();
 const port = process.env.PORT || 5000;
@@ -18,5 +19,6 @@ app.use(cookieParser());
 app.use("/api/users", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/upload", uploadRoute);
 
 app.listen(port, () => console.log(`Server Running on port ${port}`));
