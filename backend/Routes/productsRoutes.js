@@ -16,14 +16,14 @@ import {
   filterProducts,
 } from "../Controllers/productController.js";
 import { authenticate, authorizeAdmin } from "../Middlewares/authMiddleware.js";
-import checkId from "../Middlewares/checkId.js";
+import checkId from "../middlewares/checkId.js";
 
 router
   .route("/")
   .get(fetchProducts)
   .post(authenticate, authorizeAdmin, formidable(), addProduct);
 
-router.route("/tous-les-produits").get(fetchAllProducts);
+router.route("/Tous-les-produits").get(fetchAllProducts);
 router.route("/:id/reviews").post(authenticate, checkId, addProductReview);
 
 router.get("/top", fetchTopProducts);
