@@ -26,5 +26,8 @@ const productSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-const Product = mongoose.model("Product", productSchema);
+// Check if the 'Product' model is already registered before registering it again
+const Product =
+  mongoose.models.Product || mongoose.model("Product", productSchema);
+
 export default Product;
