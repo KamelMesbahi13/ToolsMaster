@@ -17,7 +17,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 router
   .route("/")
-  .post(authenticate, createOrder)
+  .post(createOrder)
   .get(authenticate, authorizeAdmin, getAllOrders);
 
 router.route("/mine").get(authenticate, getUserOrders);
