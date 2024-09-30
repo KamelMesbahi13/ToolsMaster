@@ -9,19 +9,11 @@ function calcPrices(orderItems) {
   );
 
   const shippingPrice = itemsPrice > 100 ? 0 : 10;
-  const taxRate = 0.15;
-  const taxPrice = (itemsPrice * taxRate).toFixed(2);
-
-  const totalPrice = (
-    itemsPrice +
-    shippingPrice +
-    parseFloat(taxPrice)
-  ).toFixed(2);
+  const totalPrice = (itemsPrice + shippingPrice).toFixed(2);
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
     shippingPrice: shippingPrice.toFixed(2),
-    taxPrice,
     totalPrice,
   };
 }
@@ -58,8 +50,7 @@ const createOrder = async (req, res) => {
       };
     });
 
-    const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
-      calcPrices(dbOrderItems);
+    const { itemsPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
 
     // Remove the user association here as the user is not authenticated
     const order = new Order({
@@ -67,7 +58,6 @@ const createOrder = async (req, res) => {
       shippingAddress,
       paymentMethod,
       itemsPrice,
-      taxPrice,
       shippingPrice,
       totalPrice,
     });
@@ -78,6 +68,8 @@ const createOrder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Other controllers remain unchanged but without tax-related logic
 
 const getAllOrders = async (req, res) => {
   try {
@@ -142,16 +134,17 @@ const calcualteTotalSalesByDate = async (req, res) => {
 
 const findOrderById = async (req, res) => {
   try {
+    // Find the order by its ID and populate the user field
     const order = await Order.findById(req.params.id).populate(
       "user",
-      "username email"
+      "username email" // Populate username and email from the User model
     );
 
+    // Check if the order exists
     if (order) {
       res.json(order);
     } else {
-      res.status(404);
-      throw new Error("Order not found");
+      res.status(404).json({ message: "Order not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -175,8 +168,7 @@ const markOrderAsPaid = async (req, res) => {
       const updateOrder = await order.save();
       res.status(200).json(updateOrder);
     } else {
-      res.status(404);
-      throw new Error("Order not found");
+      res.status(404).json({ message: "Order not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -194,8 +186,7 @@ const markOrderAsDelivered = async (req, res) => {
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
-      res.status(404);
-      throw new Error("Order not found");
+      res.status(404).json({ message: "Order not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -2,9 +2,6 @@ import mongoose from "mongoose";
 
 const orderSchema = mongoose.Schema(
   {
-    // Remove or comment out the user field if you don't want to link the order to an authenticated user.
-    // user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
-
     orderItems: [
       {
         name: { type: String, required: true },
@@ -22,29 +19,21 @@ const orderSchema = mongoose.Schema(
     shippingAddress: {
       address: { type: String },
       city: { type: String },
-      postalCode: { type: String },
-      country: { type: String },
-    },
-
-    paymentMethod: { type: String },
-
-    paymentResult: {
-      id: { type: String },
-      status: { type: String },
-      update_time: { type: String },
-      email_address: { type: String },
     },
 
     itemsPrice: { type: Number, default: 0.0 },
-    taxPrice: { type: Number, default: 0.0 },
     shippingPrice: { type: Number, default: 0.0 },
     totalPrice: { type: Number, required: true, default: 0.0 },
-
     isPaid: { type: Boolean, default: false },
     paidAt: { type: Date },
-
     isDelivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
+
+    // Add the user reference here
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Referencing the User model
+    },
   },
   {
     timestamps: true,
