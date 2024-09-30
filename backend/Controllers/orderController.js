@@ -1,5 +1,5 @@
-import Order from "../models/orderModel.js";
-import Product from "../models/productModel.js";
+import Order from "../Models/orderModel.js";
+import Product from "../Models/productModel.js";
 
 // Utility Function
 function calcPrices(orderItems) {
@@ -30,13 +30,13 @@ const createOrder = async (req, res) => {
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
 
-    if (orderItems && orderItems.length === 0) {
-      res.status(400);
-      throw new Error("No order items");
+    if (!orderItems || orderItems.length === 0) {
+      return res.status(400).json({ message: "No order items" });
     }
 
+    // Find the products from the database to get their correct price
     const itemsFromDB = await Product.find({
-      _id: { $in: orderItems.map((x) => x._id) },
+      _id: { $in: orderItems.map((item) => item._id) },
     });
 
     const dbOrderItems = orderItems.map((itemFromClient) => {
@@ -45,24 +45,25 @@ const createOrder = async (req, res) => {
       );
 
       if (!matchingItemFromDB) {
-        res.status(404);
-        throw new Error(`Product not found: ${itemFromClient._id}`);
+        return res
+          .status(404)
+          .json({ message: `Product not found: ${itemFromClient._id}` });
       }
 
       return {
         ...itemFromClient,
         product: itemFromClient._id,
         price: matchingItemFromDB.price,
-        _id: undefined,
+        _id: undefined, // Remove the _id from the client to avoid overriding the product ID
       };
     });
 
     const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
       calcPrices(dbOrderItems);
 
+    // Remove the user association here as the user is not authenticated
     const order = new Order({
       orderItems: dbOrderItems,
-      user: req.user._id,
       shippingAddress,
       paymentMethod,
       itemsPrice,

@@ -11,9 +11,9 @@ import {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
-} from "../controllers/orderController.js";
+} from "../Controllers/orderController.js";
 
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
+import { authenticate, authorizeAdmin } from "../Middlewares/authMiddleware.js";
 
 router
   .route("/")
