@@ -18,6 +18,59 @@ function calcPrices(orderItems) {
   };
 }
 
+// const createOrder = async (req, res) => {
+//   try {
+//     const { orderItems, shippingAddress, paymentMethod } = req.body;
+
+//     if (!orderItems || orderItems.length === 0) {
+//       return res.status(400).json({ message: "No order items" });
+//     }
+
+//     // Find the products from the database to get their correct price
+//     const itemsFromDB = await Product.find({
+//       _id: { $in: orderItems.map((item) => item._id) },
+//     });
+
+//     const dbOrderItems = orderItems.map((itemFromClient) => {
+//       const matchingItemFromDB = itemsFromDB.find(
+//         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
+//       );
+
+//       if (!matchingItemFromDB) {
+//         return res
+//           .status(404)
+//           .json({ message: `Product not found: ${itemFromClient._id}` });
+//       }
+
+//       return {
+//         ...itemFromClient,
+//         product: itemFromClient._id,
+//         price: matchingItemFromDB.price,
+//         _id: undefined, // Remove the _id from the client to avoid overriding the product ID
+//       };
+//     });
+
+//     const { itemsPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
+
+//     // Remove the user association here as the user is not authenticated
+//     const order = new Order({
+//       orderItems: dbOrderItems,
+//       shippingAddress,
+//       paymentMethod,
+//       itemsPrice,
+//       shippingPrice,
+//       totalPrice,
+//     });
+
+//     const createdOrder = await order.save();
+//     res.status(201).json(createdOrder);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
+// Other controllers remain unchanged but without tax-related logic
+
 const createOrder = async (req, res) => {
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
@@ -26,7 +79,13 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: "No order items" });
     }
 
-    // Find the products from the database to get their correct price
+    // Extract name and phone from shippingAddress
+    const { name, phone } = shippingAddress;
+
+    if (!name || !phone) {
+      return res.status(400).json({ message: "Name and phone are required" });
+    }
+
     const itemsFromDB = await Product.find({
       _id: { $in: orderItems.map((item) => item._id) },
     });
@@ -46,16 +105,19 @@ const createOrder = async (req, res) => {
         ...itemFromClient,
         product: itemFromClient._id,
         price: matchingItemFromDB.price,
-        _id: undefined, // Remove the _id from the client to avoid overriding the product ID
+        _id: undefined,
       };
     });
 
     const { itemsPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
 
-    // Remove the user association here as the user is not authenticated
     const order = new Order({
       orderItems: dbOrderItems,
-      shippingAddress,
+      shippingAddress: {
+        ...shippingAddress,
+        name, // Include name
+        phone, // Include phone
+      },
       paymentMethod,
       itemsPrice,
       shippingPrice,
@@ -68,8 +130,6 @@ const createOrder = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Other controllers remain unchanged but without tax-related logic
 
 const getAllOrders = async (req, res) => {
   try {
