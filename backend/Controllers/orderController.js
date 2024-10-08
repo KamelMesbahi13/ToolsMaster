@@ -26,7 +26,13 @@ function calcPrices(orderItems) {
 //       return res.status(400).json({ message: "No order items" });
 //     }
 
-//     // Find the products from the database to get their correct price
+//     // Extract name and phone from shippingAddress
+//     const { name, phone } = shippingAddress;
+
+//     if (!name || !phone) {
+//       return res.status(400).json({ message: "Name and phone are required" });
+//     }
+
 //     const itemsFromDB = await Product.find({
 //       _id: { $in: orderItems.map((item) => item._id) },
 //     });
@@ -46,16 +52,19 @@ function calcPrices(orderItems) {
 //         ...itemFromClient,
 //         product: itemFromClient._id,
 //         price: matchingItemFromDB.price,
-//         _id: undefined, // Remove the _id from the client to avoid overriding the product ID
+//         _id: undefined,
 //       };
 //     });
 
 //     const { itemsPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
 
-//     // Remove the user association here as the user is not authenticated
 //     const order = new Order({
 //       orderItems: dbOrderItems,
-//       shippingAddress,
+//       shippingAddress: {
+//         ...shippingAddress,
+//         name, // Include name
+//         phone, // Include phone,
+//       },
 //       paymentMethod,
 //       itemsPrice,
 //       shippingPrice,
@@ -69,8 +78,6 @@ function calcPrices(orderItems) {
 //   }
 // };
 
-// Other controllers remain unchanged but without tax-related logic
-
 const createOrder = async (req, res) => {
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
@@ -79,11 +86,13 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: "No order items" });
     }
 
-    // Extract name and phone from shippingAddress
-    const { name, phone } = shippingAddress;
+    // Destructure name, phone, and wilaya from shippingAddress
+    const { name, phone, wilaya } = shippingAddress;
 
-    if (!name || !phone) {
-      return res.status(400).json({ message: "Name and phone are required" });
+    if (!name || !phone || !wilaya) {
+      return res
+        .status(400)
+        .json({ message: "Name, phone, and wilaya are required" });
     }
 
     const itemsFromDB = await Product.find({
@@ -117,6 +126,7 @@ const createOrder = async (req, res) => {
         ...shippingAddress,
         name, // Include name
         phone, // Include phone
+        wilaya, // Include wilaya
       },
       paymentMethod,
       itemsPrice,

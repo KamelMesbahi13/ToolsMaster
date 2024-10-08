@@ -21,6 +21,7 @@ const orderSchema = mongoose.Schema(
       city: { type: String },
       name: { type: String, required: true }, // Add name field
       phone: { type: String, required: true }, // Add phone field
+      wilaya: { type: String, required: true }, // Add wilaya field
     },
 
     itemsPrice: { type: Number, default: 0.0 },
