@@ -19,9 +19,24 @@ const orderSchema = mongoose.Schema(
     shippingAddress: {
       address: { type: String },
       city: { type: String },
-      name: { type: String, required: true }, // Add name field
-      phone: { type: String, required: true }, // Add phone field
-      wilaya: { type: String, required: true }, // Add wilaya field
+      name: {
+        type: String,
+        required: true,
+        minlength: 5, // Minimum length for name
+        maxlength: 30, // Maximum length for name
+      },
+      phone: {
+        type: String,
+        required: true,
+        validate: {
+          validator: function (v) {
+            return /\d{10}/.test(v); // Validate that the phone number is exactly 10 digits
+          },
+          message: (props) =>
+            `${props.value} is not a valid 10-digit phone number!`,
+        },
+      },
+      wilaya: { type: String, required: true },
     },
 
     itemsPrice: { type: Number, default: 0.0 },
@@ -32,7 +47,6 @@ const orderSchema = mongoose.Schema(
     isDelivered: { type: Boolean, default: false },
     deliveredAt: { type: Date },
 
-    // Add the user reference here
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Referencing the User model
