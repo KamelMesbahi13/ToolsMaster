@@ -32,7 +32,15 @@ const addProduct = asyncHandler(async (req, res) => {
 
 const updateProductDetails = asyncHandler(async (req, res) => {
   try {
-    const { name, description, price, category, quantity, brand } = req.fields;
+    const {
+      name,
+      description,
+      description_ar,
+      price,
+      category,
+      quantity,
+      brand,
+    } = req.fields;
 
     // Validation
     switch (true) {
@@ -40,6 +48,8 @@ const updateProductDetails = asyncHandler(async (req, res) => {
         return res.status(400).json({ error: "Name is required" });
       case !brand:
         return res.status(400).json({ error: "Brand is required" });
+      case !description:
+        return res.status(400).json({ error: "Description is required" });
       case !description:
         return res.status(400).json({ error: "Description is required" });
       case !price:
