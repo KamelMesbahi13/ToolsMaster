@@ -30,6 +30,23 @@ const addProduct = asyncHandler(async (req, res) => {
   }
 });
 
+const getProductsByCategory = async (req, res) => {
+  try {
+    const category = req.params.category;
+    const products = await Product.find({ category });
+
+    if (products.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No products found in this category" });
+    }
+
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const updateProductDetails = asyncHandler(async (req, res) => {
   try {
     const {
@@ -223,4 +240,5 @@ export {
   fetchTopProducts,
   fetchNewProducts,
   filterProducts,
+  getProductsByCategory,
 };
